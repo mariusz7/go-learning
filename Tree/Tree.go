@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 )
 
 type ITree interface {
@@ -30,7 +29,6 @@ func newNode(v int) *Node {
 func (t *Tree) Insert(value int) {
 	if t.head == nil {
 		t.head = newNode(value)
-		//fmt.Printf("value in head: %v\n", t.head.value)
 	} else {
 		t.head.insertRec(value)
 	}
@@ -54,23 +52,13 @@ func (n *Node) insertRec(value int) {
 	}
 }
 
-func assert(everythingOK bool) {
-	if !everythingOK {
-		panic("Assertion failed.")
-	}
-}
-
 // Deletes the leftmost value first, if there are duplicates
 func (t *Tree) Delete(value int) {
-
-	fmt.Printf("Requested to delete value: %v\n", value)
-
 
 	if nil == t.head {
 		return
 	} else if t.head.value == value {
 		var deletedNode = t.head
-		fmt.Printf("deletedNode.value: %v\n", deletedNode.value)
 
 		if nil == t.head.left { //There is no left subtree
 			t.head = t.head.right
@@ -85,7 +73,8 @@ func (t *Tree) Delete(value int) {
 				//Let's implement 2.a
 				t.head = t.head.right
 
-				//In the right subtree find the leftmost node with 'left' field equal to nil
+				//In the right subtree find the leftmost node
+				//with 'left' field equal to nil
 				var lnode *Node = deletedNode.right
 				for ; lnode.left != nil; lnode = lnode.left {
 				}
@@ -103,8 +92,6 @@ func (t *Tree) Delete(value int) {
 
 func deleteImpl(value int, curRoot *Node) {
 
-	assert(curRoot.value != value)
-
 	if value < curRoot.value { //Need to delete from the left subtree
 
 		if nil == curRoot.left {
@@ -113,7 +100,6 @@ func deleteImpl(value int, curRoot *Node) {
 
 			if value == curRoot.left.value {
 				var deletedNode *Node = curRoot.left
-				fmt.Printf("deletedNode.value: %v\n", deletedNode.value)
 
 				if nil == deletedNode.left {
 					curRoot.left = deletedNode.right
@@ -124,19 +110,14 @@ func deleteImpl(value int, curRoot *Node) {
 
 						curRoot.left = deletedNode.right
 
-						//In the right subtree find the leftmost node with 'left' field equal to nil
+						//In the right subtree find the leftmost node
+						//with 'left' field equal to nil
 						var lnode *Node = deletedNode.right
-						deletedNode.right = nil //Just for sanity check later on
 
 						for ; lnode.left != nil; lnode = lnode.left {
 						}
 
 						lnode.left = deletedNode.left
-						deletedNode.left = nil //Just for sanity check later on
-
-						//Symbolic free. Fairwell deletedNode...
-						assert(nil == deletedNode.left && nil == deletedNode.right)
-						deletedNode = nil
 					}
 				}
 			} else {
@@ -147,12 +128,10 @@ func deleteImpl(value int, curRoot *Node) {
 
 		if nil == curRoot.right {
 			//That value is not present in the tree
-			fmt.Printf("That value is not present in the tree: %v\n", value)
 		} else {
 
 			if value == curRoot.right.value {
 				var deletedNode *Node = curRoot.right
-				fmt.Printf("deletedNode.value: %v\n", deletedNode.value)
 
 				if deletedNode.left == nil {
 					curRoot.right = deletedNode.right
@@ -164,19 +143,14 @@ func deleteImpl(value int, curRoot *Node) {
 
 						curRoot.right = deletedNode.right
 
-						//In the right subtree find the leftmost node with 'left' field equal to nil
+						//In the right subtree find the leftmost node
+						//with 'left' field equal to nil
 						var lnode *Node = deletedNode.right
-						deletedNode.right = nil //Just for sanity check later on
 
 						for ; lnode.left != nil; lnode = lnode.left {
 						}
 
 						lnode.left = deletedNode.left
-						deletedNode.left = nil //Just for sanity check later on
-
-						//Symbolic free. Fairwell deletedNode...
-						assert(nil == deletedNode.left && nil == deletedNode.right)
-						deletedNode = nil
 					}
 				}
 			} else {

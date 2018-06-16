@@ -120,64 +120,149 @@ func TestDelete(t *testing.T) {
 	var expected []int = []int{1, 1, 1, 2, 3, 4, 5, 5, 8, 8}
 
 	var tree Tree
+	compareEvsA([]int{}, tree.GetAllValues(), t)
+
+	tree.Delete(666)
+	//printTree(&tree)
+	compareEvsA([]int{}, tree.GetAllValues(), t)
 
 	for _, v := range inserted {
 		tree.Insert(v)
 	}
 
-	printTree(&tree)
+	//printTree(&tree)
 
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(1)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{1, 1, 2, 3, 4, 5, 5, 8, 8}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(5)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{1, 1, 2, 3, 4, 5, 8, 8}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(8)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{1, 1, 2, 3, 4, 5, 8}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(8)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{1, 1, 2, 3, 4, 5}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(1)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{1, 2, 3, 4, 5}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(1)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{2, 3, 4, 5}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
+	tree.Delete(1) //Trying to delete non-existing value on the left hand side
+
 	tree.Delete(4)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{2, 3, 5}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(5)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{2, 3}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
 	tree.Delete(3)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{2}
 	compareEvsA(expected, tree.GetAllValues(), t)
 
+	tree.Delete(100) //Trying to delete non-existing value on the right hand side
+
 	tree.Delete(2)
-	printTree(&tree)
+	//printTree(&tree)
 	expected = []int{}
 	compareEvsA(expected, tree.GetAllValues(), t)
+
+
+
+
+
+
+
+	var tree2 Tree
+	for _, v := range inserted {
+		tree2.Insert(v)
+	}
+	//Missing case: delete root node having both subtrees
+	tree2.Delete(3)
+	expected = []int{1, 1, 1, 2, 4, 5, 5, 8, 8}
+	compareEvsA(expected, tree2.GetAllValues(), t)
+
+
+	var tree4 Tree
+	for _, v := range []int{5, 3, 2, 1} {
+		tree4.Insert(v)
+	}
+	//printTree(&tree4)
+	//Missing case: delete node without right subtree
+	tree4.Delete(2)
+	expected = []int{1, 3, 5}
+	compareEvsA(expected, tree4.GetAllValues(), t)
+
+
+	var tree5 Tree
+	for _, v := range []int{5, 3, 2, 1, 4} {
+		tree5.Insert(v)
+	}
+	//printTree(&tree5)
+	tree5.Delete(3)
+	expected = []int{1, 2, 4, 5}
+	compareEvsA(expected, tree5.GetAllValues(), t)
+
+
+
+
+
+	var tree6 Tree
+	for _, v := range []int{5, 3, 2, 1, 4, 10, 9, 8} {
+		tree6.Insert(v)
+	}
+	//printTree(&tree6)
+	tree6.Delete(5)
+	expected = []int{1, 2, 3, 4, 8, 9, 10}
+	compareEvsA(expected, tree6.GetAllValues(), t)
+
+
+
+
+
+	var tree7 Tree
+	for _, v := range []int{10, 5, 7, 4, 8, 9, 6} {
+		tree7.Insert(v)
+	}
+	//printTree(&tree7)
+	tree7.Delete(5)
+	//printTree(&tree7)
+	expected = []int{4, 6, 7, 8, 9, 10}
+	compareEvsA(expected, tree7.GetAllValues(), t)
+
+
+
+
+	var tree8 Tree
+	for _, v := range []int{1, 10, 5, 15, 12} {
+		tree8.Insert(v)
+	}
+	//printTree(&tree8)
+	tree8.Delete(10)
+	//printTree(&tree8)
+	expected = []int{1, 5, 12, 15}
+	compareEvsA(expected, tree8.GetAllValues(), t)
 }
 
 func TestGetNthElement(t *testing.T) {
@@ -188,12 +273,18 @@ func TestGetNthElement(t *testing.T) {
 	var insertedInMeantime []int = []int{3, 3, 4, 8, 8, 8, 8, 8, 8, 8}
 
 	var tree Tree
+	if _, err := tree.GetNthElement(123); err == nil {
+		t.Errorf("Getting from empty tree shall return an error\n")
+	}
 
+	if _, err := tree.GetNthElement(-123); err == nil {
+		t.Errorf("Giving negative number as a parameter shall return an error\n")
+	}
 
 	for i, v := range inserted {
 		tree.Insert(v)
 
-		printTree(&tree)
+		//printTree(&tree)
 
 		vreturned, err := tree.GetNthElement(i)
 		if err != nil {
@@ -268,9 +359,6 @@ func printTree(t *Tree) {
 		const minSpaceBetweenValues = 2
 
 		for row := 0; row < len(tree2D); row++ {
-
-			var nodes int = len(tree2D[row])
-			assert(nodes > 0)
 
 			var inBetweenSpacesPerLevel []int = []int{0, 30, 14, 6, 2}
 
