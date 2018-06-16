@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"container/list"
 )
 
 type ITree interface {
@@ -61,37 +60,6 @@ func assert(everythingOK bool) {
 	}
 }
 
-func (t *Tree) PrintTree() {
-	var tree2D [][]string = [][]string{
-		[]string{"1"},
-		[]string{"2", "3"},
-		[]string{"4", "5", "6", "7"},
-	}
-
-	var fifo *list.List = list.New()
-
-	//Traverse the tree using breadth-first way
-	if nil != t.head {
-		fifo.PushBack(t.head)
-		while fifo.Len() > 0 {
-			var node *Node = fifo.Front()
-		}
-	}
-
-
-	//Get 2D tree
-
-	for row := 0; row < len(tree2D); row++ {
-		fmt.Printf("row: %v\n", tree2D[row])
-	}
-}
-
-func (t *Tree) printTree() {
-
-		
-
-}
-
 // Deletes the leftmost value first, if there are duplicates
 func (t *Tree) Delete(value int) {
 
@@ -106,29 +74,30 @@ func (t *Tree) Delete(value int) {
 
 		if nil == t.head.left { //There is no left subtree
 			t.head = t.head.right
-		} else if nil == t.head.right { //There are none subtrees
-			//Nothing more to do, if this was the last node in the tree
-		} else { //Both subtrees exist
-			//2 options available:
-			// a) make left subtree part of the right subtree
-			// b) make right subtree part of the left subtree
+		} else {
+			if nil == t.head.right {
+				t.head = t.head.left
+			} else { //Both subtrees exist
+				//2 options available:
+				// a) make left subtree part of the right subtree
+				// b) make right subtree part of the left subtree
 
-			//Let's implement 2.a
-			t.head = t.head.right
+				//Let's implement 2.a
+				t.head = t.head.right
 
-			//In the right subtree find the leftmost node with 'left' field equal to nil
-			var lnode *Node = deletedNode.right
-			for ; lnode.left != nil; lnode = lnode.left {
+				//In the right subtree find the leftmost node with 'left' field equal to nil
+				var lnode *Node = deletedNode.right
+				for ; lnode.left != nil; lnode = lnode.left {
+				}
+
+				lnode.left = deletedNode.left
+
+				//Symbolic free. Fairwell deletedNode...
+				deletedNode = nil
 			}
-
-			lnode.left = deletedNode.left
-
-			//Symbolic free. Fairwell deletedNode...
-			deletedNode = nil
 		}
 	} else {
-		var curRoot *Node = t.head
-		deleteImpl(value, curRoot)
+		deleteImpl(value, t.head)
 	}
 }
 
@@ -148,25 +117,27 @@ func deleteImpl(value int, curRoot *Node) {
 
 				if nil == deletedNode.left {
 					curRoot.left = deletedNode.right
-				} else if nil == deletedNode.right {
-					//deletedNode does not have any subtrees we need to take care of
-				} else { //Both subtrees exist
+				} else {
+					if nil == deletedNode.right {
+						curRoot.left = deletedNode.left
+					} else { //Both subtrees exist
 
-					curRoot.left = deletedNode.right
+						curRoot.left = deletedNode.right
 
-					//In the right subtree find the leftmost node with 'left' field equal to nil
-					var lnode *Node = deletedNode.right
-					deletedNode.right = nil //Just for sanity check later on
+						//In the right subtree find the leftmost node with 'left' field equal to nil
+						var lnode *Node = deletedNode.right
+						deletedNode.right = nil //Just for sanity check later on
 
-					for ; lnode.left != nil; lnode = lnode.left {
+						for ; lnode.left != nil; lnode = lnode.left {
+						}
+
+						lnode.left = deletedNode.left
+						deletedNode.left = nil //Just for sanity check later on
+
+						//Symbolic free. Fairwell deletedNode...
+						assert(nil == deletedNode.left && nil == deletedNode.right)
+						deletedNode = nil
 					}
-
-					lnode.left = deletedNode.left
-					deletedNode.left = nil //Just for sanity check later on
-
-					//Symbolic free. Fairwell deletedNode...
-					assert(nil == deletedNode.left && nil == deletedNode.right)
-					deletedNode = nil
 				}
 			} else {
 				deleteImpl(value, curRoot.left)
@@ -183,27 +154,30 @@ func deleteImpl(value int, curRoot *Node) {
 				var deletedNode *Node = curRoot.right
 				fmt.Printf("deletedNode.value: %v\n", deletedNode.value)
 
-				if nil == deletedNode.left {
+				if deletedNode.left == nil {
 					curRoot.right = deletedNode.right
-				} else if nil == deletedNode.right {
-					//deletedNode does not have any subtrees we need to take care of
-				} else { //Both subtrees exist
+				} else {
+					if deletedNode.right == nil {
 
-					curRoot.right = deletedNode.right
+						curRoot.right = deletedNode.left
+					} else {
 
-					//In the right subtree find the leftmost node with 'left' field equal to nil
-					var lnode *Node = deletedNode.right
-					deletedNode.right = nil //Just for sanity check later on
+						curRoot.right = deletedNode.right
 
-					for ; lnode.left != nil; lnode = lnode.left {
+						//In the right subtree find the leftmost node with 'left' field equal to nil
+						var lnode *Node = deletedNode.right
+						deletedNode.right = nil //Just for sanity check later on
+
+						for ; lnode.left != nil; lnode = lnode.left {
+						}
+
+						lnode.left = deletedNode.left
+						deletedNode.left = nil //Just for sanity check later on
+
+						//Symbolic free. Fairwell deletedNode...
+						assert(nil == deletedNode.left && nil == deletedNode.right)
+						deletedNode = nil
 					}
-
-					lnode.left = deletedNode.left
-					deletedNode.left = nil //Just for sanity check later on
-
-					//Symbolic free. Fairwell deletedNode...
-					assert(nil == deletedNode.left && nil == deletedNode.right)
-					deletedNode = nil
 				}
 			} else {
 				deleteImpl(value, curRoot.right)
@@ -216,40 +190,38 @@ func (t *Tree) GetNthElement(n int) (int, error) {
 
 	if n < 0 {
 		return 0, errors.New("n < 0")
-	} else if t.head == nil {
+	}
+
+	if t.head == nil {
 		return 0, errors.New("Tree does not contain any elements")
 	}
 
-	var curElement int //holds 0
+	var curElement int = 0
 
 	return getNthElementImpl(n, & curElement, t.head)
 }
 
 func getNthElementImpl(n int, curElement *int, node *Node) (int, error) {
 
-	if node.left == nil {
-		if n == *curElement {
-			return node.value, nil
-		} else {
-			if node.right == nil {
-				return 0, errors.New("Dead end")
-			} else {
-				*curElement++
-				return getNthElementImpl(n, curElement, node.right)
-			}
-		}
-	} else {
-		if v, err := getNthElementImpl(n, curElement, node.left); err == nil {
-			return v, err
-		} else {
-			if n == *curElement {
-				return node.value, nil
-			} else {
-				*curElement++
-				return getNthElementImpl(n, curElement, node.right)
-			}
+	if node.left != nil {
+		if v, e := getNthElementImpl(n, curElement, node.left); e == nil {
+			return v, nil
 		}
 	}
+
+	if n == *curElement {
+		return node.value, nil
+	}
+
+	*curElement++
+
+	if node.right != nil {
+		if v, e := getNthElementImpl(n, curElement, node.right); e == nil {
+			return v, nil
+		}
+	}
+
+	return 0, errors.New("value requested not present in this tree")
 }
 
 func (t *Tree) GetAllValues() []int {
@@ -268,7 +240,7 @@ func getAllValues(node *Node, allValues []int) []int {
 		//2. Append the current value
 		allValues = append(allValues, node.value)
 
-		fmt.Printf("allValues after appending: %v\n", allValues)
+		//fmt.Printf("allValues after appending: %v\n", allValues)
 
 		if nil != node.right {
 			//3. Append values from the right subtree
