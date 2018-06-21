@@ -28,31 +28,54 @@ type MyArrayList struct {
 }
 
 func (ali *MyArrayList) PushFront(element interface{}) {
-	ali.arrayList = append([]interface{}{element}, ali.arrayList)
+	ali.arrayList = append([]interface{}{element}, ali.arrayList...)
 }
 
 func (ali *MyArrayList) PushBack(element interface{}) {
 	ali.arrayList = append(ali.arrayList, element)
 }
 
-
-
-
-
-
-
-
-
-
 func (ali *MyArrayList) Insert(index int, element interface{}) error {
+
 	if index > len(ali.arrayList) {
 		return errors.New("Out of bound input")
 	}
 
-	ali.arrayList = append(
-		ali.arrayList[:index],
-		element,
-		ali.arrayList[index + 1:])
+	if len(ali.arrayList) <= 0 { //Insert into empty
+
+		ali.arrayList = []interface{}{element}
+
+	} else if index == len(ali.arrayList) { //Insert at the end
+
+		ali.arrayList = append(ali.arrayList, element)
+
+	} else { //Insert at the beginning or somewhere inside
+
+		//fmt.Printf("oryginal arrayList: %v\n", ali.arrayList)
+
+		var before []interface{} = ali.arrayList[:index]
+		//fmt.Printf("before: %v\n", before)
+
+		var after []interface {} = ali.arrayList[index:]
+		//fmt.Printf("after: %v\n", after)
+
+		//Yeah, not optimal way, but I am just learning, Christ...
+		ali.arrayList = make([]interface{}, 0,
+			len(before) + 1 + len(after))
+
+		if len(before) > 0 {
+			ali.arrayList = append(ali.arrayList, before...)
+			//fmt.Printf("arrayList with before: %v\n", ali.arrayList)
+		}
+
+		ali.arrayList = append(ali.arrayList, element)
+		//fmt.Printf("arrayList with element: %v\n", ali.arrayList)
+
+		if len(after) > 0 {
+			ali.arrayList = append(ali.arrayList, after...)
+			//fmt.Printf("arrayList with after: %v\n", ali.arrayList)
+		}
+	}
 
 	return nil
 }
@@ -91,8 +114,6 @@ func (ali *MyArrayList) Get(index int) (interface{}, error) {
 	return ali.arrayList[index], nil
 }
 
-
-
 func (ali *MyArrayList) IndexOf(element interface{}) (int, error) {
 	for i, v := range ali.arrayList {
 		if v == element {
@@ -102,7 +123,6 @@ func (ali *MyArrayList) IndexOf(element interface{}) (int, error) {
 
 	return -1, errors.New("Not found")
 }
-
 
 func (ali *MyArrayList) Contains(element interface{}) bool {
 	for _, v := range ali.arrayList {
@@ -115,6 +135,7 @@ func (ali *MyArrayList) Contains(element interface{}) bool {
 }
 
 func (ali *MyArrayList) Remove(index int) error {
+
 	if index < 0 || index >= len(ali.arrayList) {
 		return errors.New("Out of bound input index")
 	}
@@ -122,26 +143,28 @@ func (ali *MyArrayList) Remove(index int) error {
 	if len(ali.arrayList) == 1 {
 		ali.arrayList = make([]interface{}, 0)
 	} else {
-		ali.arrayList = ali.arrayList[:index]
+		var before []interface{} = ali.arrayList[:index]
+		var after []interface{}
 
 		if index < len(ali.arrayList) - 1 {
-			ali.arrayList = append(ali.arrayList, ali.arrayList[index + 1:])
+			after = ali.arrayList[index + 1:]
+		} else {
+			after = make([]interface{}, 0)
 		}
+
+		ali.arrayList = append(before, after...)
 	}
 
 	return nil
 }
 
-
 func (ali *MyArrayList) Size() int {
 	return len(ali.arrayList)
 }
 
-
 func (ali *MyArrayList) Clear() {
 	ali.arrayList = make([]interface{}, 0)
 }
-
 
 func (ali *MyArrayList) IsEmpty() bool {
 	return len(ali.arrayList) <= 0
