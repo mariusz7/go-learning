@@ -11,6 +11,7 @@ func TestPushes(t *testing.T) {
 		43, 22, 1, 77, -21, 33, 54, -84,
 		19, -52, 5, 1, 66, -0, 99, -11}
 
+	
 	for i := 0; i < len(inserted); i += 4 {
 		//4 operations, so 4 loops expected
 		//and for the above table of size 16 we should
@@ -73,7 +74,7 @@ func TestPops(t *testing.T) {
 
 func TestIndexOf(t *testing.T) {
 
-	var ali IArrayList = &MyArrayList{arrayList: []interface{}{-12, 1, 789}}
+	var ali IArrayList = &MyArrayList{alist: []interface{}{-12, 1, 789}}
 
 	if v, e := ali.IndexOf(1); e == nil {
 		if v != 1 {
@@ -108,7 +109,7 @@ func TestIndexOf(t *testing.T) {
 
 func TestContains(t *testing.T) {
 
-	var ali IArrayList = &MyArrayList{arrayList: []interface{}{-12, 1, 789}}
+	var ali IArrayList = &MyArrayList{alist: []interface{}{-12, 1, 789}}
 
 	if ali.Contains(-10) {
 		t.Error("Unexpected value exists in the container")
@@ -139,7 +140,7 @@ func compare(expected []int, actual IArrayList, t *testing.T) {
 }
 
 func getTestArrayList() IArrayList {
-	return &MyArrayList{arrayList: []interface{}{
+	return &MyArrayList{alist: []interface{}{
 		43, 22, 1, 77, -21, 33, 54, -84,
 		19, -52, 5, 1, 66, -0, 99, -11}}
 }
