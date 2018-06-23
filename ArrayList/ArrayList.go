@@ -29,7 +29,7 @@ type MyArrayList struct {
 	alist []interface{}
 }
 
-func (al *MyArrayList) getSliceForNewElements(newElements int) (newSlice bool , s []interface{}, e error) {
+func (al *MyArrayList) getSliceForNewElements(newElements int) (newSlice bool, s []interface{}, e error) {
 
 	//TODO handle overflowing int in the below addition (use e)
 	var suffCap int = len(al.alist) + newElements
@@ -50,7 +50,6 @@ func (al *MyArrayList) getSliceForNewElements(newElements int) (newSlice bool , 
 		newSlice = true
 		s = make([]interface{}, 0, newCap)
 		e = nil
-		fmt.Printf("old cap: %v, new cap: %v\n", cap(al.alist), cap(s))
 
 	} else {
 		newSlice = false
@@ -61,6 +60,7 @@ func (al *MyArrayList) getSliceForNewElements(newElements int) (newSlice bool , 
 }
 
 func (al *MyArrayList) PushFront(element interface{}) error {
+
 	if newSlice, s, e := al.getSliceForNewElements(1); e == nil {
 
 		//None 'append()' call below should reallocate
@@ -69,7 +69,7 @@ func (al *MyArrayList) PushFront(element interface{}) error {
 			s = append(s, element) 
 			s = append(s, al.alist...)
 			al.alist = s
-			fmt.Printf("len(al.alist): %v +PF\n", len(al.alist))
+
 			return nil
 		} else {
 			var appendLast bool = false
@@ -85,7 +85,6 @@ func (al *MyArrayList) PushFront(element interface{}) error {
 				al.alist = append(al.alist, last)
 			}
 
-			fmt.Printf("len(al.alist): %v 0PF\n", len(al.alist))
 			return nil
 		}
 	} else {
