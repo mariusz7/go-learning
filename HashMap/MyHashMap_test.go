@@ -1,0 +1,37 @@
+package myhashtable
+
+
+import (
+	"testing"
+	"math/rand"
+	"fmt"
+)
+
+
+func TestMyHashMap(t *testing.T) {
+
+	const valCount = 1000
+	var hm MyHashMap
+	var testPairs []KeyValue
+
+	for i := 0; i < valCount; i++ {
+		key, value := rand.Intn(10000), rand.Intn(10000)
+
+		fmt.Printf("key: %v, value: %v\n", key, value)
+
+		testPairs = append(testPairs, KeyValue{key: key, value: value})
+
+		hm.Insert(key, value)
+	}
+
+	for _, pair := range testPairs {
+		if actualValue, err := hm.GetValue(pair.key); err == nil {
+			if pair.value != actualValue {
+				t.Errorf("Key: %v, expected value: %v, actual value: %v\n",
+					pair.key, pair.value, actualValue)
+			}
+		} else {
+			t.Errorf("Unexpected error: %v for key: %v\n", err, pair.key)
+		}
+	}
+}
