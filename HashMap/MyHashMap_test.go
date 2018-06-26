@@ -4,7 +4,7 @@ package myhashtable
 import (
 	"testing"
 	"math/rand"
-	"fmt"
+	"strconv"
 )
 
 
@@ -15,9 +15,10 @@ func TestMyHashMap(t *testing.T) {
 	var testPairs []KeyValue
 
 	for i := 0; i < valCount; i++ {
-		key, value := rand.Intn(10000), rand.Intn(10000)
+		key := rand.Intn(10000)
+		value := "keyInStr:" + strconv.Itoa(key)
 
-		fmt.Printf("key: %v, value: %v\n", key, value)
+		//fmt.Printf("key: %v, value: %v\n", key, value)
 
 		testPairs = append(testPairs, KeyValue{key: key, value: value})
 
